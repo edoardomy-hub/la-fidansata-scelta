@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dove mangiamo stasera, amore? 💕</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink-50: #fff0f6;
+    --pink-100: #ffe0ee;
+    --pink-200: #ffc2dc;
+    --pink-300: #ff9cc6;
+    --pink-400: #ff6fae;
+    --pink-500: #ff4596;
+    --pink-600: #e62e7e;
+    --pink-700: #b81e62;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: 'Fredoka', system-ui, sans-serif;
+    color: var(--pink-700);
+    background: radial-gradient(circle at 20% 10%, #ffd6e8 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, #ffc8e0 0%, transparent 45%),
+                linear-gradient(160deg, #ffe4f0 0%, #ffd1e6 50%, #ffbfdc 100%);
+    background-attachment: fixed;
+    overflow-x: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 14px 56px;
+    min-height: 100vh;
+  }
+
+  #hearts-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .float-heart { position: absolute; bottom: -60px; animation: floatUp linear forwards; opacity: .75; user-select: none; }
+  @keyframes floatUp {
+    0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+    10%  { opacity: .8; }
+    50%  { transform: translateY(-55vh) translateX(30px) rotate(15deg); }
+    100% { transform: translateY(-115vh) translateX(-20px) rotate(-10deg); opacity: 0; }
+  }
+
+  .card {
+    position: relative; z-index: 1; width: 100%; max-width: 560px;
+    background: rgba(255, 250, 252, .92);
+    border: 4px solid #fff; border-radius: 36px;
+    box-shadow: 0 18px 50px rgba(230, 46, 126, .25), 0 0 0 8px rgba(255, 156, 198, .35);
+    padding: 34px 26px 28px; text-align: center; backdrop-filter: blur(6px);
+  }
+  .card::before, .card::after { content: '💗'; position: absolute; font-size: 38px; animation: wiggle 2.4s ease-in-out infinite; }
+  .card::before { top: -22px; left: -14px; }
+  .card::after  { bottom: -20px; right: -12px; content: '💖'; animation-delay: .6s; }
+  @keyframes wiggle { 0%,100% { transform: rotate(-12deg) scale(1); } 50% { transform: rotate(12deg) scale(1.15); } }
+
+  h1 {
+    font-family: 'Pacifico', cursive; font-weight: 400;
+    font-size: clamp(28px, 7vw, 40px); color: var(--pink-500);
+    text-shadow: 3px 3px 0 #fff, 5px 5px 0 var(--pink-200);
+    line-height: 1.25; margin-bottom: 10px;
+  }
+  h2 { font-size: clamp(22px, 5.5vw, 28px); font-weight: 700; color: var(--pink-600); margin-bottom: 6px; }
+  .sub { color: var(--pink-400); font-size: 17px; margin-bottom: 22px; font-weight: 500; }
+
+  .screen { display: none; animation: pop .45s cubic-bezier(.34,1.56,.64,1); }
+  .screen.active { display: block; }
+  @keyframes pop { from { opacity: 0; transform: scale(.85) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+  .big-emoji { font-size: 64px; display: inline-block; animation: bounce 1.6s ease-in-out infinite; margin-bottom: 6px; }
+  @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+  .btn {
+    font-family: inherit; font-size: 18px; font-weight: 600; border: none; cursor: pointer;
+    border-radius: 999px; padding: 14px 28px; color: #fff;
+    background: linear-gradient(180deg, var(--pink-400), var(--pink-500));
+    box-shadow: 0 6px 0 var(--pink-600), 0 10px 20px rgba(230,46,126,.3);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .btn:hover { transform: translateY(-2px) scale(1.04); }
+  .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--pink-600); }
+  .btn.ghost { background: #fff; color: var(--pink-500); box-shadow: 0 6px 0 var(--pink-200), 0 10px 20px rgba(230,46,126,.15); }
+  .btn.small { font-size: 15px; padding: 10px 18px; }
+
+  .intro-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 8px; min-height: 70px; position: relative; }
+  #runaway { position: relative; transition: left .25s, top .25s; }
+
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 6px; }
+  .option {
+    font-family: inherit; background: #fff; border: 3px solid var(--pink-200); border-radius: 26px;
+    padding: 16px 10px 14px; cursor: pointer; color: var(--pink-700);
+    transition: transform .2s cubic-bezier(.34,1.56,.64,1), border-color .2s, background .2s;
+    box-shadow: 0 5px 0 var(--pink-100);
+  }
+  .option:hover { transform: translateY(-4px) rotate(-1.5deg); border-color: var(--pink-400); background: var(--pink-50); }
+  .option:nth-child(even):hover { transform: translateY(-4px) rotate(1.5deg); }
+  .option.picked { background: var(--pink-400); border-color: var(--pink-500); color: #fff; transform: scale(1.06); }
+  .option .e { font-size: 40px; display: block; margin-bottom: 6px; }
+  .option .t { font-size: 17px; font-weight: 600; display: block; line-height: 1.2; }
+  .option .d { font-size: 13px; opacity: .75; display: block; margin-top: 4px; }
+
+  .progress { display: flex; justify-content: center; gap: 8px; margin-bottom: 18px; }
+  .progress span { font-size: 20px; filter: grayscale(1) opacity(.35); transition: filter .3s, transform .3s; }
+  .progress span.on { filter: none; transform: scale(1.2); }
+
+  .back { margin-top: 20px; background: none; border: none; font-family: inherit; color: var(--pink-400); font-size: 15px; cursor: pointer; text-decoration: underline; }
+
+  .verdict {
+    background: linear-gradient(135deg, var(--pink-100), #fff);
+    border: 3px dashed var(--pink-300); border-radius: 24px;
+    padding: 16px; margin: 4px 0 16px; font-size: 17px; line-height: 1.45;
+  }
+
+  /* location box */
+  .locbox {
+    background: #fff; border: 3px solid var(--pink-100); border-radius: 22px;
+    padding: 12px 14px; margin-bottom: 14px; font-size: 15px;
+  }
+  .locbox .row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+  .locbox select {
+    font-family: inherit; font-size: 15px; color: var(--pink-700);
+    border: 2px solid var(--pink-200); border-radius: 999px; padding: 8px 14px; background: var(--pink-50);
+  }
+  .locstatus { font-weight: 600; color: var(--pink-600); }
+
+  .places { display: flex; flex-direction: column; gap: 12px; text-align: left; }
+  .place {
+    background: #fff; border: 3px solid var(--pink-100); border-radius: 22px;
+    padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start;
+    animation: pop .5s both cubic-bezier(.34,1.56,.64,1);
+  }
+  .place .pe { font-size: 30px; line-height: 1; }
+  .place .pn { font-weight: 700; font-size: 18px; color: var(--pink-600); }
+  .place .pa { font-size: 13px; color: var(--pink-400); font-weight: 500; }
+  .place .pd { font-size: 15px; color: #8a3a5e; margin: 4px 0 8px; line-height: 1.35; }
+  .place .dist {
+    display: inline-block; font-size: 13px; font-weight: 600; color: var(--pink-700);
+    background: var(--pink-50); border: 2px dashed var(--pink-200); border-radius: 12px;
+    padding: 4px 10px; margin-bottom: 8px;
+  }
+  .place .links { display: flex; gap: 6px; flex-wrap: wrap; }
+  .place a {
+    display: inline-block; font-size: 14px; font-weight: 600; text-decoration: none; color: #fff;
+    background: var(--pink-400); padding: 6px 14px; border-radius: 999px;
+  }
+  .place a.alt { background: #fff; color: var(--pink-500); border: 2px solid var(--pink-300); padding: 4px 12px; }
+  .place a:hover { background: var(--pink-500); color: #fff; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 600; background: var(--pink-100); color: var(--pink-600); padding: 2px 8px; border-radius: 999px; margin-left: 4px; vertical-align: middle; }
+
+  .more { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .pagecount { font-size: 13px; color: var(--pink-400); }
+  .chips-title { font-size: 15px; font-weight: 600; margin-top: 6px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .chip {
+    font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+    background: #fff; color: var(--pink-600); border: 2px solid var(--pink-200);
+    border-radius: 999px; padding: 6px 12px; transition: transform .15s, background .15s;
+  }
+  .chip:hover { transform: scale(1.07); background: var(--pink-50); }
+  .chip.on { background: var(--pink-400); color: #fff; border-color: var(--pink-500); }
+
+  .warning {
+    margin-top: 16px; font-size: 13px; color: #9b4a6e; background: #fff5f9;
+    border-radius: 16px; padding: 10px 14px; text-align: left; line-height: 1.4;
+  }
+  .warning a { color: var(--pink-600); font-weight: 600; }
+
+  .result-actions { display: flex; flex-direction: column; gap: 14px; align-items: center; margin-top: 22px; }
+
+  .locked { font-family: 'Pacifico', cursive; font-size: 26px; color: var(--pink-500); margin-top: 6px; }
+  .contract {
+    margin-top: 14px; background: #fff; border: 3px solid var(--pink-200); border-radius: 18px;
+    padding: 14px; font-size: 15px; line-height: 1.5; font-style: italic;
+  }
+
+  .burst { position: fixed; pointer-events: none; z-index: 10; font-size: 26px; animation: burst 1.2s ease-out forwards; }
+  @keyframes burst { to { transform: translate(var(--dx), var(--dy)) scale(.4) rotate(var(--r)); opacity: 0; } }
+
+  footer {
+    position: fixed; bottom: 0; left: 0; right: 0; text-align: center; font-size: 14px; font-weight: 600;
+    color: var(--pink-600); z-index: 2; padding: 8px; background: rgba(255, 224, 238, .75); backdrop-filter: blur(4px);
+  }
+
+  @media (max-width: 420px) {
+    .card { padding: 28px 16px 22px; border-radius: 28px; }
+    .options { gap: 10px; }
+    .option { padding: 12px 6px; }
+    .option .e { font-size: 34px; }
+    .option .t { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+<div id="hearts-bg"></div>
+
+<main class="card">
+
+  <!-- INTRO -->
+  <section class="screen active" id="s-intro">
+    <div class="big-emoji">🍝</div>
+    <h1>Dove mangiamo stasera, amore?</h1>
+    <p class="sub">Prima domanda… lo sai già? 💭</p>
+    <div class="intro-buttons">
+      <button class="btn ghost" id="runaway">Sì, lo so!</button>
+      <button class="btn" id="start">No… scegli tu 🥺</button>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="screen" id="s-quiz">
+    <div class="progress" id="progress"></div>
+    <div class="big-emoji" id="q-emoji">💕</div>
+    <h2 id="q-title"></h2>
+    <p class="sub" id="q-sub"></p>
+    <div class="options" id="q-options"></div>
+    <button class="back" id="back">← torna indietro</button>
+  </section>
+
+  <!-- RESULT -->
+  <section class="screen" id="s-result">
+    <div class="big-emoji" id="r-emoji">💘</div>
+    <h1 id="r-title">Il verdetto è arrivato!</h1>
+    <div class="verdict" id="r-verdict"></div>
+
+    <div class="locbox" id="locbox">
+      <div>📍 <span class="locstatus" id="locstatus">Dimmi dove sei e ti dico quanto è lontano!</span></div>
+      <div class="row">
+        <button class="btn small" id="geo">📡 Usa la mia posizione</button>
+        <select id="zone" aria-label="Scegli la tua zona">
+          <option value="">…oppure scegli la zona</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="places" id="r-places"></div>
+
+    <div class="more" id="more">
+      <button class="btn small ghost" id="refresh">🔄 Fammi vedere altre proposte</button>
+      <div class="pagecount" id="pagecount"></div>
+      <div class="chips-title">Cambiato idea? Prova invece:</div>
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <div class="warning" id="r-warning"></div>
+    <div class="result-actions">
+      <button class="btn" id="lock">💍 Decisione finale, niente ripensamenti</button>
+      <button class="btn ghost" id="again">🔄 Mmm, rifacciamo il quiz</button>
+    </div>
+  </section>
+
+  <!-- LOCKED -->
+  <section class="screen" id="s-locked">
+    <div class="big-emoji">💞</div>
+    <p class="locked">È ufficiale!</p>
+    <div class="contract" id="contract"></div>
+    <div class="result-actions">
+      <button class="btn ghost" id="restart">Ricomincia (solo se lui è d'accordo 😇)</button>
+    </div>
+  </section>
+
+</main>
+
+<footer>fatto con amore per la mia patina (beccate sto heacker) 💗</footer>
+
+<script>
+/* ================= DATI ================= */
+const QUESTIONS = [
+  {
+    key: 'hunger', emoji: '🍽️',
+    title: 'Quanta fame ha la mia principessa?',
+    sub: 'Sii sincera, qui sei al sicuro 💕',
+    options: [
+      { v: 'starving', e: '🐻', t: 'FAMEEE', d: 'Mi mangerei un orso intero' },
+      { v: 'hungry',   e: '😋', t: 'Bella fame', d: 'Una cena come si deve' },
+      { v: 'peckish',  e: '🤏', t: 'Un languorino', d: 'Qualcosa di leggerino' },
+      { v: 'barely',   e: '🎀', t: 'Quasi niente', d: 'Solo una coccola golosa' }
+    ]
+  },
+  {
+    key: 'vibe', emoji: '🌙',
+    title: "Che mood c'è stasera?",
+    sub: 'Tu scegli il mood, io porto il piano ✨',
+    options: [
+      { v: 'romantic', e: '🕯️', t: 'Cena romantica', d: 'Ci vestiamo carini e usciamo' },
+      { v: 'casual',   e: '🛵', t: 'Easy e divertente', d: 'Usciamo, ma in scarpe comode' },
+      { v: 'cook',     e: '👩‍🍳', t: 'Si cucina insieme', d: 'Serata cozy ai fornelli' },
+      { v: 'couch',    e: '🛋️', t: 'Pigiama e divano', d: 'Zero sbatti, tante coccole' }
+    ]
+  },
+  {
+    key: 'craving', emoji: '🤤',
+    title: 'Cosa ti chiede il pancino?',
+    sub: '(tutto senza glutine, ovviamente 🌾🚫)',
+    options: [
+      { v: 'pizza',    e: '🍕', t: 'Pizza', d: 'Filante, croccante, perfetta' },
+      { v: 'roman',    e: '🍝', t: 'Pasta e cucina romana', d: 'Energia carbonara' },
+      { v: 'asian',    e: '🥢', t: 'Cinese / Asiatico', d: 'Noodles, riso, ravioli' },
+      { v: 'street',   e: '🍔', t: 'Burger e fritti', d: 'Vibes da street food' },
+      { v: 'sweet',    e: '🍦', t: 'Qualcosa di dolce', d: 'Il dolce È la cena' },
+      { v: 'surprise', e: '🎁', t: 'Sorprendimi!', d: 'Fidati del quiz' }
+    ]
+  }
+];
+
+const CRAVING_NAMES = {
+  pizza: 'pizza 🍕', roman: 'pasta e cucina romana 🍝', asian: 'cucina asiatica 🥢',
+  street: 'burger e fritti 🍔', sweet: 'qualcosa di dolce 🍦'
+};
+const CRAVINGS = Object.keys(CRAVING_NAMES);
+
+/* ll = coordinate approssimative [lat, lng]; null = indirizzo non verificato (solo link percorso) */
+const PLACES = {
+  pizza: [
+    { e: '🍕', n: 'Cimarra 4', a: 'Monti · Via Cimarra 4', d: 'Pizzeria certificata AIC, con forno separato per la pizza senza glutine.', tags: ['casual','romantic'], q: 'Cimarra 4 Pizzeria Via Cimarra Roma', ll: [41.8956, 12.4918] },
+    { e: '❤️', n: 'Mama Eat', a: 'Trastevere · Via di San Cosimato 7', d: 'Quasi tutto il menù anche senza glutine: pizza, pasta, fritti.', tags: ['casual','romantic'], q: 'Mama Eat Via di San Cosimato 7 Roma', ll: [41.8886, 12.4697] },
+    { e: '🌟', n: 'La Soffitta Renovatio', a: 'Prati · Piazza del Risorgimento', d: 'Pizza napoletana anche in versione senza glutine.', tags: ['casual','romantic'], q: 'La Soffitta Renovatio Roma', ll: [41.9066, 12.4588] },
+    { e: '🔥', n: 'Pizzeria Teresina', a: 'Roma', d: 'Cucina e forno separati per le pizze senza glutine.', tags: ['casual'], q: 'Pizzeria Teresina Roma senza glutine', ll: null },
+    { e: '🔎', n: 'Altre pizzerie SG', a: 'Ricerca su Google Maps', d: 'Tutte le pizzerie con pizza senza glutine vicino a te.', tags: ['casual','romantic'], q: 'pizzeria senza glutine', ll: null, search: true }
+  ],
+  roman: [
+    { e: '🍝', n: 'Mama Eat', a: 'Trastevere · Via di San Cosimato 7', d: 'Carbonara, amatriciana & co., tutto disponibile senza glutine.', tags: ['casual','romantic'], q: 'Mama Eat Via di San Cosimato 7 Roma', ll: [41.8886, 12.4697] },
+    { e: '🍚', n: 'Risotteria Melotti', a: 'Centro · Via della Vite', d: 'Risotteria dove (quasi) tutto è naturalmente senza glutine.', tags: ['romantic'], q: 'Risotteria Melotti Roma', ll: [41.9036, 12.4808] },
+    { e: '🏛️', n: 'Rifugio Romano', a: 'Termini · Via Volturno', d: 'Storico preferito dei celiaci, tanti piatti romani senza glutine.', tags: ['casual','romantic'], q: 'Rifugio Romano Via Volturno Roma', ll: [41.9041, 12.4993] },
+    { e: '🌷', n: 'Il Tulipano Nero', a: 'Trastevere · Via Roma Libera', d: 'Trattoria con pasta e pizza senza glutine.', tags: ['casual','romantic'], q: 'Il Tulipano Nero Trastevere Roma', ll: [41.8879, 12.4690] },
+    { e: '🐔', n: 'La Gallina Bianca', a: 'Esquilino · zona Termini', d: 'Piatti romani e pizza con opzioni senza glutine.', tags: ['casual'], q: 'La Gallina Bianca Roma', ll: [41.8992, 12.4979] },
+    { e: '🔎', n: 'Altre trattorie SG', a: 'Ricerca su Google Maps', d: 'Ristoranti romani con menù senza glutine vicino a te.', tags: ['casual','romantic'], q: 'ristorante senza glutine', ll: null, search: true }
+  ],
+  asian: [
+    { e: '🌶️', n: 'Ristorante Cinese Sichuan', a: 'Monti · Via di San Martino ai Monti 33/C', d: 'Cucina del Sichuan piccante, con opzioni senza glutine. Chiedi della salsa di soia!', tags: ['casual','romantic'], q: 'Ristorante Cinese Sichuan Via di San Martino ai Monti 33 Roma', ll: [41.8954, 12.4986] },
+    { e: '🍣', n: 'Oishi Sushi', a: 'Ostiense · Via del Gazometro 40/B', d: 'Sushi segnalato sulle app per celiaci. Chiedi il tamari al posto della soia.', tags: ['casual','romantic'], q: 'Oishi Sushi Via del Gazometro 40 Roma', ll: [41.8716, 12.4762] },
+    { e: '🔎', n: 'Altri asiatici SG', a: 'Ricerca su Google Maps', d: 'Ristoranti asiatici che parlano di senza glutine. Chiama prima: la soia normale ha il grano!', tags: ['casual','romantic'], q: 'ristorante cinese giapponese senza glutine', ll: null, search: true }
+  ],
+  street: [
+    { e: '🍔', n: 'Polpetta Gluten Free', a: 'Ostiense', d: 'Due cucine e due staff separati: polpette, fritti, comfort food.', tags: ['casual'], q: 'Polpetta Gluten Free Roma', ll: null },
+    { e: '❤️', n: 'Mama Eat', a: 'Trastevere · Via di San Cosimato 7', d: 'Fritti senza glutine: supplì, fiori di zucca… il sogno.', tags: ['casual','romantic'], q: 'Mama Eat Via di San Cosimato 7 Roma', ll: [41.8886, 12.4697] },
+    { e: '🥐', n: 'Celiachiamo', a: 'Roma', d: 'Forno 100% senza glutine: pizza al taglio, pane fresco e tanto altro.', tags: ['casual'], q: 'Celiachiamo Roma', ll: null },
+    { e: '🌾', n: 'Le Altre Farine del Mulino', a: 'zona Vaticano', d: 'Forno senza glutine per pizza, snack e dolci.', tags: ['casual'], q: 'Le Altre Farine del Mulino Roma', ll: null },
+    { e: '🔎', n: 'Altri burger SG', a: 'Ricerca su Google Maps', d: 'Hamburgerie con pane senza glutine vicino a te.', tags: ['casual','romantic'], q: 'hamburger senza glutine', ll: null, search: true }
+  ],
+  sweet: [
+    { e: '🍦', n: 'Fatamorgana', a: 'Trastevere · Via Roma Libera (e altre sedi)', d: 'Gelato famoso per essere amico dei celiaci, con coni senza glutine.', tags: ['casual','romantic'], q: 'Gelateria Fatamorgana Trastevere Roma', ll: [41.8882, 12.4688] },
+    { e: '🍫', n: 'Grezzo Raw Chocolate', a: 'Monti · Via Urbana', d: 'Gelato e dolci al cioccolato crudo, senza glutine.', tags: ['casual','romantic'], q: 'Grezzo Raw Chocolate Via Urbana Roma', ll: [41.8961, 12.4933] },
+    { e: '🧁', n: 'Celiachiamo', a: 'Roma', d: 'Forno 100% senza glutine: cornetti, torte, biscotti.', tags: ['casual'], q: 'Celiachiamo Roma', ll: null },
+    { e: '🔎', n: 'Altre pasticcerie SG', a: 'Ricerca su Google Maps', d: 'Gelaterie e pasticcerie senza glutine vicino a te.', tags: ['casual','romantic'], q: 'pasticceria gelateria senza glutine', ll: null, search: true }
+  ]
+};
+
+/* RICETTARIO: 120 ricette senza glutine (18 pizza · 24 romane · 18 asiatiche · 18 street · 22 dolci · 20 leggere) */
+const RECIPES = {
+  pizza: [
+    { e: '🍕', n: 'Serata pizza fatta in casa', d: 'Farina per pizza senza glutine (tipo Caputo Fioreglut o Mix Schär), 2 ore di lievitazione e poi litigata sui condimenti.', q: 'pizza senza glutine fatta in casa ricetta' },
+    { e: '🫓', n: 'Focaccia senza glutine', d: 'Alta, morbida, con rosmarino e sale grosso. Da mangiare calda sul divano.', q: 'focaccia senza glutine ricetta' },
+    { e: '🍳', n: 'Pizza in padella', d: 'Niente lievitazione lunga: impasto senza glutine cotto in padella in 15 minuti. Per le fami improvvise.', q: 'pizza in padella senza glutine ricetta' },
+    { e: '🥟', n: 'Calzone ripieno', d: 'Impasto SG chiuso a mezzaluna con ricotta, mozzarella e prosciutto cotto. Filante dentro, dorato fuori.', q: 'calzone senza glutine ricetta' },
+    { e: '🧀', n: 'Pizza bianca con mortadella', d: 'La classica romana: pizza bianca croccante SG farcita di mortadella (controlla che sia senza glutine).', q: 'pizza bianca romana senza glutine ricetta' },
+    { e: '🍥', n: 'Pizzette rosse da aperitivo', d: 'Tante mini pizzette al pomodoro e origano: perfette da mangiare davanti a un film.', q: 'pizzette senza glutine ricetta' },
+    { e: '🥔', n: 'Pizza patate e rosmarino', d: 'Patate tagliate sottilissime, rosmarino e olio buono. Semplice e irresistibile.', q: 'pizza patate e rosmarino senza glutine ricetta' },
+    { e: '🌱', n: 'Pizza di cavolfiore', d: 'Base fatta col cavolfiore, uova e formaggio: niente farina, tutto gusto.', q: 'pizza di cavolfiore ricetta' },
+    { e: '🍅', n: 'Margherita in teglia', d: 'Alta e soffice come quella del forno sotto casa, con pomodoro, mozzarella e basilico.', q: 'pizza in teglia senza glutine ricetta' },
+    { e: '🔥', n: 'Pizza fritta montanara', d: 'Dischetti di impasto SG fritti, pomodoro e parmigiano sopra. Napoli chiama Roma.', q: 'montanara pizza fritta senza glutine ricetta' },
+    { e: '🫓', n: 'Pinsa romana', d: 'Impasto idratatissimo con mix SG, ovale e croccante. Da farcire con quello che c’è in frigo.', q: 'pinsa romana senza glutine ricetta' },
+    { e: '🧀', n: 'Pizza ai quattro formaggi', d: 'Mozzarella, gorgonzola, fontina e parmigiano. Per serate senza sensi di colpa.', q: 'pizza quattro formaggi senza glutine ricetta' },
+    { e: '🎃', n: 'Pizza zucca e salsiccia', d: 'Crema di zucca, salsiccia sbriciolata (SG) e provola. Pizza d’autunno.', q: 'pizza zucca e salsiccia senza glutine ricetta' },
+    { e: '🌶️', n: 'Pizza diavola', d: 'Salame piccante senza glutine, pomodoro e mozzarella. Per le serate piccanti.', q: 'pizza diavola senza glutine ricetta' },
+    { e: '🌼', n: 'Pizza fiori di zucca e alici', d: 'Bianca, con mozzarella, fiori di zucca e alici. La più romana di tutte.', q: 'pizza fiori di zucca e alici senza glutine ricetta' },
+    { e: '🌀', n: 'Rotolo di pizza farcito', d: 'Impasto SG arrotolato con prosciutto e formaggio, tagliato a girelle. Si mangia in due minuti.', q: 'rotolo di pizza senza glutine ricetta' },
+    { e: '🫘', n: 'Farinata di ceci', d: 'Solo farina di ceci, acqua, olio e sale: naturalmente senza glutine e croccante ai bordi.', q: 'farinata di ceci ricetta' },
+    { e: '🍫', n: 'Pizza dolce alla Nutella', d: 'Base SG cotta in bianco e poi coperta di Nutella. Il dolce che sembra una cena.', q: 'pizza alla nutella senza glutine ricetta' }
+  ],
+  roman: [
+    { e: '🍝', n: 'Carbonara per due', d: 'Rigatoni senza glutine, guanciale, tuorli, pecorino, tanto pepe. 20 minuti, zero panna, massimo romanticismo.', q: 'carbonara ricetta originale senza glutine' },
+    { e: '🧀', n: 'Cacio e pepe', d: 'Tonnarelli senza glutine, pecorino e pepe. Semplice ma ci vuole amore per la cremina.', q: 'cacio e pepe senza glutine ricetta' },
+    { e: '🍅', n: 'Amatriciana', d: 'Bucatini senza glutine, guanciale, pomodoro e pecorino. Un classico che non delude mai.', q: 'amatriciana senza glutine ricetta' },
+    { e: '🥓', n: 'Gricia', d: 'La mamma della carbonara: mezze maniche SG, guanciale croccante e pecorino.', q: 'pasta alla gricia senza glutine ricetta' },
+    { e: '🍙', n: 'Supplì fatti in casa', d: 'Riso al sugo, cuore di mozzarella e panatura con pangrattato senza glutine. Telefono a filo garantito.', q: 'supplì senza glutine ricetta' },
+    { e: '🥩', n: 'Saltimbocca alla romana', d: 'Fettine di vitello, prosciutto crudo e salvia. Al posto della farina usa farina di riso.', q: 'saltimbocca alla romana senza glutine ricetta' },
+    { e: '🍖', n: 'Abbacchio a scottadito', d: 'Costolette d’agnello alla griglia con limone e patate al forno. Naturalmente senza glutine.', q: 'abbacchio a scottadito ricetta' },
+    { e: '🥬', n: 'Pasta e broccoli', d: 'Pasta corta SG, broccoli, aglio, peperoncino e una grattata di pecorino. Comfort food.', q: 'pasta e broccoli senza glutine ricetta' },
+    { e: '🍲', n: 'Gnocchi di patate', d: 'Gnocchi fatti a mano con farina di riso, conditi con burro e salvia o al sugo.', q: 'gnocchi senza glutine ricetta' },
+    { e: '🍳', n: 'Frittata di pasta', d: 'Spaghetti SG avanzati, uova, pecorino e pepe, in padella fino a diventare croccanti.', q: 'frittata di pasta senza glutine ricetta' },
+    { e: '🧈', n: 'Fettuccine Alfredo', d: 'L’originale romana: fettuccine SG, burro e parmigiano mantecati fino a fare la crema.', q: 'fettuccine alfredo originale senza glutine ricetta' },
+    { e: '😈', n: 'Pasta alla zozzona', d: 'Carbonara + amatriciana + salsiccia. Per le fami serie, con salsiccia senza glutine.', q: 'pasta alla zozzona senza glutine ricetta' },
+    { e: '🧄', n: 'Aglio, olio e peperoncino', d: 'Lo spaghetto di mezzanotte: spaghetti SG, aglio, olio e peperoncino. 10 minuti e via.', q: 'spaghetti aglio olio e peperoncino senza glutine' },
+    { e: '🌿', n: 'Carciofi alla romana', d: 'Carciofi stufati con mentuccia, aglio e olio. Naturalmente senza glutine.', q: 'carciofi alla romana ricetta' },
+    { e: '🌸', n: 'Carciofi alla giudia', d: 'Fritti due volte, croccanti come fiori dorati. Un classico del Ghetto, senza glutine.', q: 'carciofi alla giudia ricetta' },
+    { e: '🐂', n: 'Coda alla vaccinara', d: 'Coda stufata a lungo con pomodoro e sedano. Si cucina piano, si mangia con le mani.', q: 'coda alla vaccinara ricetta' },
+    { e: '🫑', n: 'Pollo con i peperoni', d: 'Il secondo di Ferragosto romano, buono tutto l’anno. Pollo, peperoni e pomodoro.', q: 'pollo con i peperoni alla romana ricetta' },
+    { e: '🍲', n: 'Trippa alla romana', d: 'Trippa al sugo con mentuccia e pecorino. Per chi ama la cucina della nonna.', q: 'trippa alla romana ricetta' },
+    { e: '🍽️', n: 'Lasagna al forno', d: 'Sfoglie SG, ragù e besciamella fatta con amido di mais. La domenica in una teglia.', q: 'lasagna senza glutine ricetta' },
+    { e: '🫘', n: 'Pasta e ceci', d: 'Ditalini SG, ceci, rosmarino e un filo d’olio. Cremosa e coccolosa.', q: 'pasta e ceci senza glutine ricetta' },
+    { e: '🐚', n: 'Spaghetti alle vongole', d: 'Spaghetti SG, vongole, aglio, prezzemolo e vino bianco. Profumo di mare a casa.', q: 'spaghetti alle vongole senza glutine ricetta' },
+    { e: '🌼', n: 'Fiori di zucca fritti', d: 'Ripieni di mozzarella e alici, in pastella di farina di riso e acqua frizzante.', q: 'fiori di zucca fritti senza glutine ricetta' },
+    { e: '🧆', n: 'Polpette di bollito', d: 'Il riciclo romano: bollito, patate, uova e pangrattato SG. Fritte o al forno.', q: 'polpette di bollito senza glutine ricetta' },
+    { e: '🍄', n: 'Risotto ai porcini', d: 'Riso Carnaroli, porcini e parmigiano. Controlla che il brodo sia senza glutine.', q: 'risotto ai funghi porcini ricetta' }
+  ],
+  asian: [
+    { e: '🥢', n: 'Noodles di riso saltati', d: 'Noodles di riso, verdure, pollo o gamberi e TAMARI al posto della soia (quella normale ha il grano!).', q: 'noodles di riso saltati tamari ricetta' },
+    { e: '🍚', n: 'Riso alla cantonese', d: 'Riso, uova, piselli, prosciutto cotto senza glutine e un filo di tamari.', q: 'riso alla cantonese senza glutine ricetta' },
+    { e: '🥜', n: 'Pad thai', d: 'Noodles di riso, gamberi o pollo, arachidi, lime e tamari. Profumo di vacanza in cucina.', q: 'pad thai senza glutine ricetta' },
+    { e: '🥟', n: 'Ravioli al vapore', d: 'Impasto con farina di riso glutinoso e ripieno di maiale e verdure. Lavoro di squadra!', q: 'ravioli cinesi senza glutine ricetta' },
+    { e: '🍣', n: 'Sushi fatto in casa', d: 'Uramaki e nigiri con salmone e avocado. Tamari per intingere e tanta pazienza col tappetino.', q: 'sushi fatto in casa senza glutine ricetta' },
+    { e: '🍗', n: 'Pollo alle mandorle', d: 'Bocconcini di pollo con amido di mais, mandorle tostate e tamari. Come al ristorante cinese.', q: 'pollo alle mandorle senza glutine ricetta' },
+    { e: '🍛', n: 'Curry di pollo al cocco', d: 'Pollo, latte di cocco, curry e riso basmati. Controlla che la pasta di curry sia SG.', q: 'curry di pollo latte di cocco ricetta' },
+    { e: '🥗', n: 'Poke bowl', d: 'Riso, salmone o tonno, avocado, edamame, mango e salsa al tamari. Colorata e fresca.', q: 'poke bowl fatta in casa ricetta' },
+    { e: '🐟', n: 'Salmone teriyaki', d: 'Salsa teriyaki fatta in casa con tamari, miele e zenzero. Con riso bianco e sesamo.', q: 'salmone teriyaki senza glutine ricetta' },
+    { e: '🍳', n: 'Bibimbap', d: 'Riso, verdure, manzo e uovo all’occhio di bue. Attenzione: il gochujang spesso ha grano, cercalo SG!', q: 'bibimbap senza glutine ricetta' },
+    { e: '🍜', n: 'Pho vietnamita', d: 'Brodo di manzo profumato, noodles di riso, erbe fresche e lime. Una zuppa da abbraccio.', q: 'pho vietnamita ricetta' },
+    { e: '🌯', n: 'Involtini di carta di riso', d: 'Spring rolls freschi con gamberi, verdure e menta, da intingere in salsa di arachidi.', q: 'involtini carta di riso ricetta' },
+    { e: '🍍', n: 'Riso fritto thai all’ananas', d: 'Riso saltato con ananas, anacardi, gamberi e tamari. Servito nell’ananas se vuoi fare scena.', q: 'riso fritto thai ananas ricetta' },
+    { e: '🍖', n: 'Maiale in agrodolce', d: 'Bocconcini di maiale con amido di mais, peperoni e ananas in salsa agrodolce.', q: 'maiale in agrodolce senza glutine ricetta' },
+    { e: '🍜', n: 'Ramen con noodles di riso', d: 'Brodo con tamari e miso SG, uovo marinato, maiale e cipollotto.', q: 'ramen senza glutine ricetta' },
+    { e: '🍤', n: 'Tempura di gamberi e verdure', d: 'Pastella con farina di riso e acqua ghiacciata frizzante. Leggerissima.', q: 'tempura senza glutine ricetta' },
+    { e: '🟢', n: 'Curry verde thai', d: 'Pollo, latte di cocco, pasta di curry verde (controlla SG) e basilico thai.', q: 'curry verde thai ricetta' },
+    { e: '🍙', n: 'Onigiri', d: 'Triangolini di riso ripieni di tonno e maionese o salmone, avvolti nell’alga nori.', q: 'onigiri ricetta' }
+  ],
+  street: [
+    { e: '🍔', n: 'Smash burger night', d: 'Panini per burger senza glutine, carne schiacciata, cheddar e patatine al forno. Mani sporche, cuori felici.', q: 'smash burger senza glutine ricetta' },
+    { e: '🧆', n: 'Polpette al sugo', d: 'Polpette con pangrattato senza glutine, cotte nel sugo. Scarpetta obbligatoria (con pane SG).', q: 'polpette al sugo senza glutine ricetta' },
+    { e: '🍗', n: 'Alette e patatine al forno', d: 'Alette marinate con paprika e miele, patatine croccanti. Film obbligatorio.', q: 'alette di pollo al forno senza glutine ricetta' },
+    { e: '🌮', n: 'Tacos night', d: 'Tortillas di mais (100% mais!), carne speziata, guacamole e pico de gallo.', q: 'tacos tortillas di mais ricetta' },
+    { e: '🍤', n: 'Cotolette croccanti', d: 'Pollo impanato con farina di mais o corn flakes SG. Croccantissime anche al forno.', q: 'cotoletta senza glutine ricetta' },
+    { e: '🌭', n: 'Hot dog fatti in casa', d: 'Panini SG, würstel senza glutine, cipolle caramellate e salse a volontà.', q: 'hot dog fatti in casa senza glutine' },
+    { e: '🧀', n: 'Nachos gratinati', d: 'Tortilla chips di mais, cheddar fuso, jalapeños e panna acida. Si mangia con le mani.', q: 'nachos gratinati ricetta' },
+    { e: '🍟', n: 'Fish and chips', d: 'Merluzzo in pastella di farina di riso e acqua frizzante, patatine fritte e limone.', q: 'fish and chips senza glutine ricetta' },
+    { e: '🫓', n: 'Piadina farcita', d: 'Piadina SG con crudo, squacquerone e rucola. Si arrotola e si addenta.', q: 'piadina senza glutine ricetta' },
+    { e: '🍊', n: 'Arancini siciliani', d: 'Al ragù o burro e prosciutto, con impanatura senza glutine. Belli grossi.', q: 'arancini senza glutine ricetta' },
+    { e: '🧀', n: 'Quesadillas', d: 'Tortillas di mais con formaggio filante, pollo e peperoni, scottate in padella.', q: 'quesadillas tortillas di mais ricetta' },
+    { e: '🥙', n: 'Burrito bowl', d: 'Riso, fagioli neri, carne speziata, mais, guacamole e salsa. Tutto il burrito senza la piadina.', q: 'burrito bowl ricetta' },
+    { e: '🐷', n: 'Pulled pork burger', d: 'Maiale cotto lentamente con salsa BBQ (controlla SG) in un panino senza glutine.', q: 'pulled pork senza glutine ricetta' },
+    { e: '🐣', n: 'Chicken nuggets', d: 'Bocconcini di pollo impanati nei corn flakes senza glutine, al forno o fritti.', q: 'chicken nuggets senza glutine ricetta' },
+    { e: '🫒', n: 'Olive all’ascolana', d: 'Olive ripiene di carne, impanate con pangrattato SG e fritte. Una tira l’altra.', q: 'olive ascolane senza glutine ricetta' },
+    { e: '🥙', n: 'Kebab bowl', d: 'Pollo marinato con spezie e yogurt, riso, verdure e salsa allo yogurt.', q: 'kebab di pollo fatto in casa ricetta' },
+    { e: '🥔', n: 'Patate dippers con salse', d: 'Spicchi di patate speziati al forno con maionese, ketchup e salsa barbecue SG.', q: 'patate dippers al forno ricetta' },
+    { e: '🧈', n: 'Crocchette di patate', d: 'Patate, parmigiano e cuore filante, impanate con pangrattato senza glutine.', q: 'crocchette di patate senza glutine ricetta' }
+  ],
+  sweet: [
+    { e: '🍰', n: 'Tiramisù senza glutine', d: 'Savoiardi senza glutine, mascarpone, caffè e cacao. Da fare insieme leccando il cucchiaio.', q: 'tiramisù senza glutine ricetta' },
+    { e: '🍫', n: 'Mug cake al cioccolato', d: 'Pronta in 2 minuti al microonde con farina di mandorle. Una tazza, due cucchiai.', q: 'mug cake senza glutine ricetta' },
+    { e: '🥞', n: 'Crêpes alla Nutella', d: 'Con farina di riso: si fanno in un attimo e si farciscono come si vuole.', q: 'crepes farina di riso ricetta' },
+    { e: '🍮', n: 'Panna cotta ai frutti rossi', d: 'Panna, zucchero, gelatina e una salsa ai frutti di bosco. Si prepara prima e si gode dopo.', q: 'panna cotta frutti di bosco ricetta' },
+    { e: '🍪', n: 'Biscotti con gocce di cioccolato', d: 'Cookies morbidi con mix di farine SG. Da mangiare caldi col latte.', q: 'cookies senza glutine ricetta' },
+    { e: '🧁', n: 'Pancake per cena', d: 'Pancake soffici con farina di riso, sciroppo d’acero e fragole. Chi ha detto che sono solo per colazione?', q: 'pancake senza glutine ricetta' },
+    { e: '🍫', n: 'Torta caprese', d: 'Torta napoletana al cioccolato e mandorle: naturalmente senza farina, umida e golosa.', q: 'torta caprese ricetta' },
+    { e: '🍓', n: 'Fragole e cioccolato fuso', d: 'Fonduta di cioccolato fondente con fragole, banane e marshmallow. Romanticismo puro.', q: 'fonduta di cioccolato ricetta' },
+    { e: '🍨', n: 'Salame di cioccolato', d: 'Con biscotti senza glutine, cacao, burro e zucchero. Niente forno, solo frigo.', q: 'salame di cioccolato senza glutine ricetta' },
+    { e: '🟫', n: 'Brownies', d: 'Fondenti, umidi e con la crosticina. Con farina di riso o di mandorle.', q: 'brownies senza glutine ricetta' },
+    { e: '🥧', n: 'Crostata di marmellata', d: 'Frolla senza glutine e la tua marmellata preferita. Le strisce le fa lui.', q: 'crostata senza glutine ricetta' },
+    { e: '🍰', n: 'Cheesecake ai frutti di bosco', d: 'Base di biscotti SG, crema di formaggio e topping ai frutti rossi.', q: 'cheesecake senza glutine ricetta' },
+    { e: '🫐', n: 'Muffin ai mirtilli', d: 'Soffici e pieni di mirtilli, con mix di farine senza glutine.', q: 'muffin ai mirtilli senza glutine ricetta' },
+    { e: '🍫', n: 'Mousse al cioccolato', d: 'Solo cioccolato fondente e uova montate. Naturalmente senza glutine e super romantica.', q: 'mousse al cioccolato ricetta' },
+    { e: '🔥', n: 'Crème brûlée', d: 'Crema alla vaniglia con la crosticina di zucchero da rompere col cucchiaino. Naturalmente SG.', q: 'creme brulee ricetta' },
+    { e: '🍌', n: 'Banana bread', d: 'Con banane mature, noci e farina di riso o d’avena SG certificata.', q: 'banana bread senza glutine ricetta' },
+    { e: '🍎', n: 'Torta di mele', d: 'La torta della nonna, con mele a fettine sopra e mix di farine senza glutine.', q: 'torta di mele senza glutine ricetta' },
+    { e: '☁️', n: 'Maritozzi con la panna', d: 'Il dolce romano per eccellenza, in versione senza glutine. Panna a volontà.', q: 'maritozzi senza glutine ricetta' },
+    { e: '🥖', n: 'Churros', d: 'Con farina di riso, fritti, zucchero e cannella e cioccolata calda per intingere.', q: 'churros senza glutine ricetta' },
+    { e: '🧇', n: 'Waffle', d: 'Waffle croccanti fuori e morbidi dentro, con gelato o sciroppo d’acero.', q: 'waffle senza glutine ricetta' },
+    { e: '🍮', n: 'Budino al cioccolato', d: 'Latte, cacao, zucchero e amido di mais. Si fa in 10 minuti, si aspetta in frigo.', q: 'budino al cioccolato con amido di mais ricetta' },
+    { e: '🤍', n: 'Pavlova', d: 'Meringa croccante fuori e morbida dentro, panna e frutti rossi. Naturalmente senza glutine.', q: 'pavlova ricetta' }
+  ],
+  light: [
+    { e: '🍋', n: 'Risotto al limone', d: 'Il riso è naturalmente senza glutine! Controlla che il dado dica "senza glutine".', q: 'risotto al limone ricetta' },
+    { e: '🎃', n: 'Vellutata di zucca', d: 'Calda e coccolosa, perfetta per novembre. Con crostini di pane senza glutine.', q: 'vellutata di zucca ricetta' },
+    { e: '🥗', n: 'Insalata di riso', d: 'Riso, tonno, uova sode, verdurine e olive. Leggera ma sazia.', q: 'insalata di riso ricetta' },
+    { e: '🍳', n: 'Frittata di zucchine', d: 'Uova, zucchine, menta e parmigiano. Pronta in 15 minuti.', q: 'frittata di zucchine ricetta' },
+    { e: '🐟', n: 'Salmone al forno con patate', d: 'Salmone con limone ed erbe, patate novelle al rosmarino. Una teglia, zero sbatti.', q: 'salmone al forno con patate ricetta' },
+    { e: '🫘', n: 'Zuppa di lenticchie', d: 'Lenticchie, carote, sedano e un filo d’olio a crudo. Calda come un abbraccio.', q: 'zuppa di lenticchie ricetta' },
+    { e: '🍅', n: 'Caprese e piadina SG', d: 'Mozzarella di bufala, pomodori e basilico con una piadina senza glutine scaldata in padella.', q: 'piadina senza glutine ricetta' },
+    { e: '🥕', n: 'Minestrone', d: 'Tutte le verdure di stagione e un po’ di riso. Fa bene e scalda il cuore.', q: 'minestrone di verdure ricetta' },
+    { e: '🍋', n: 'Pollo al limone', d: 'Petto di pollo infarinato con farina di riso, sfumato al limone, con verdure grigliate.', q: 'pollo al limone senza glutine ricetta' },
+    { e: '🐠', n: 'Orata al cartoccio', d: 'Orata con pomodorini, olive e capperi, chiusa in carta forno. Pulita e profumata.', q: 'orata al cartoccio ricetta' },
+    { e: '🌽', n: 'Polenta con funghi', d: 'Polenta morbida (è di mais, quindi SG!) con funghi trifolati.', q: 'polenta con funghi ricetta' },
+    { e: '🫘', n: 'Hummus e verdure crude', d: 'Hummus di ceci fatto in casa con carote, sedano e gallette di riso.', q: 'hummus fatto in casa ricetta' },
+    { e: '🥕', n: 'Vellutata di carote e zenzero', d: 'Arancione, cremosa e un po’ piccantina. Con semi tostati sopra.', q: 'vellutata di carote e zenzero ricetta' },
+    { e: '🇬🇷', n: 'Insalata greca', d: 'Pomodori, cetrioli, feta, olive e cipolla rossa. Estate in una ciotola.', q: 'insalata greca ricetta' },
+    { e: '🍳', n: 'Uova in purgatorio', d: 'Uova cotte nel sugo di pomodoro piccante. Scarpetta con pane SG obbligatoria.', q: 'uova in purgatorio ricetta' },
+    { e: '🌾', n: 'Quinoa con verdure', d: 'Quinoa (senza glutine!) con zucchine, peperoni e feta. Leggera e saziante.', q: 'quinoa con verdure ricetta' },
+    { e: '🥩', n: 'Bresaola, rucola e grana', d: 'Il piatto zero sbatti: bresaola, rucola, scaglie di grana e limone.', q: 'carpaccio di bresaola rucola e grana' },
+    { e: '🍤', n: 'Spiedini di gamberi', d: 'Gamberi marinati con limone, aglio e prezzemolo, alla piastra.', q: 'spiedini di gamberi alla piastra ricetta' },
+    { e: '🥔', n: 'Patate al cartoccio ripiene', d: 'Patate cotte al forno e riempite con formaggio, prosciutto ed erba cipollina.', q: 'patate al cartoccio ripiene ricetta' },
+    { e: '🥑', n: 'Toast di avocado e uova', d: 'Pane senza glutine tostato, avocado schiacciato e uova strapazzate.', q: 'avocado toast con uova ricetta' }
+  ]
+};
+const RECIPE_COUNT = Object.values(RECIPES).reduce((n, l) => n + l.length, 0);
+/* mescola il ricettario così ogni sera l'ordine è diverso */
+function shuffleRecipes() {
+  Object.values(RECIPES).forEach(l => {
+    for (let i = l.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [l[i], l[j]] = [l[j], l[i]]; }
+  });
+}
+
+/* zone di Roma per stimare la distanza senza GPS */
+const ZONES = {
+  'Centro Storico': [41.8986, 12.4769], 'Trastevere': [41.8890, 12.4700], 'Monti': [41.8950, 12.4930],
+  'Prati': [41.9070, 12.4610], 'Testaccio': [41.8770, 12.4760], 'Ostiense / Garbatella': [41.8650, 12.4820],
+  'San Giovanni': [41.8860, 12.5070], 'Termini / Esquilino': [41.8990, 12.5020], 'San Lorenzo': [41.8970, 12.5150],
+  'Pigneto': [41.8880, 12.5280], 'Parioli / Flaminio': [41.9250, 12.4850], 'Trieste / Salario': [41.9200, 12.5050],
+  'Monteverde': [41.8780, 12.4560], 'Appio / Tuscolano': [41.8750, 12.5250], 'Balduina / Monte Mario': [41.9200, 12.4400],
+  'EUR': [41.8320, 12.4700]
+};
+
+/* ================= STATO ================= */
+let step = 0;
+const answers = {};
+let userPos = null;      // [lat, lng]
+let userPosLabel = '';
+const res = { mode: 'out', craving: 'pizza', page: 0 };
+const PAGE_SIZE = 3;
+
+/* ================= UTILITY ================= */
+const $ = id => document.getElementById(id);
+const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+const mapsSearch = q => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+const mapsDir = q => 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(q) +
+  (userPos ? '&origin=' + userPos[0] + ',' + userPos[1] : '');
+const webSearch = q => 'https://www.google.com/search?q=' + encodeURIComponent(q);
+const youtube = q => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q);
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function burst(x, y, n = 18) {
+  const icons = ['💖','💕','💗','💓','💘','🩷','✨'];
+  for (let i = 0; i < n; i++) {
+    const h = document.createElement('div');
+    h.className = 'burst';
+    h.textContent = pick(icons);
+    h.style.left = x + 'px'; h.style.top = y + 'px';
+    const ang = Math.random() * Math.PI * 2, dist = 80 + Math.random() * 140;
+    h.style.setProperty('--dx', Math.cos(ang) * dist + 'px');
+    h.style.setProperty('--dy', Math.sin(ang) * dist + 'px');
+    h.style.setProperty('--r', (Math.random() * 360 - 180) + 'deg');
+    document.body.appendChild(h);
+    setTimeout(() => h.remove(), 1300);
+  }
+}
+
+/* distanza in linea d'aria (km) */
+function haversine(a, b) {
+  const R = 6371, toRad = x => x * Math.PI / 180;
+  const dLat = toRad(b[0] - a[0]), dLng = toRad(b[1] - a[1]);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a[0])) * Math.cos(toRad(b[0])) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+function distanceLabel(p) {
+  if (!userPos || !p.ll) return '';
+  const road = haversine(userPos, p.ll) * 1.35;              // le strade non sono dritte
+  const walk = Math.round(road / 4.8 * 60);                   // 4,8 km/h a piedi
+  const moto = Math.max(5, Math.round(road / 18 * 60 + 3));   // ~18 km/h nel traffico di Roma + parcheggio
+  const km = road < 1 ? Math.round(road * 1000) + ' m' : road.toFixed(1).replace('.', ',') + ' km';
+  const parts = [`📏 circa ${km}`];
+  if (walk <= 30) parts.push(`🚶‍♀️ ~${walk} min a piedi`);
+  parts.push(`🛵 ~${moto} min in motorino/auto`);
+  return parts.join(' · ');
+}
+
+/* ================= CUORI CHE VOLANO ================= */
+(function hearts() {
+  const bg = $('hearts-bg');
+  const icons = ['💗','💕','💖','🩷','💓','🌸','💞'];
+  function spawn() {
+    const h = document.createElement('div');
+    h.className = 'float-heart';
+    h.textContent = pick(icons);
+    h.style.left = Math.random() * 100 + 'vw';
+    h.style.fontSize = (16 + Math.random() * 26) + 'px';
+    const dur = 8 + Math.random() * 8;
+    h.style.animationDuration = dur + 's';
+    bg.appendChild(h);
+    setTimeout(() => h.remove(), dur * 1000);
+  }
+  for (let i = 0; i < 8; i++) setTimeout(spawn, i * 400);
+  setInterval(spawn, 700);
+})();
+
+/* ================= INTRO: il "sì" scappa ================= */
+const runaway = $('runaway');
+let escapes = 0;
+const taunts = ['Sì, lo so!', 'Sicura? 🤨', 'Bugiarda 😂', 'Eh no 💅', 'Dai su…', "Premi l'altro 🥰"];
+function flee(ev) {
+  ev.preventDefault();
+  escapes++;
+  const box = runaway.parentElement.getBoundingClientRect();
+  const maxX = Math.max(60, box.width / 2 - 40);
+  runaway.style.left = (Math.random() * 2 - 1) * maxX + 'px';
+  runaway.style.top = (Math.random() * 2 - 1) * 50 + 'px';
+  runaway.textContent = taunts[Math.min(escapes, taunts.length - 1)];
+}
+runaway.addEventListener('mouseenter', flee);
+runaway.addEventListener('touchstart', flee, { passive: false });
+runaway.addEventListener('click', flee);
+
+$('start').addEventListener('click', e => {
+  burst(e.clientX, e.clientY);
+  step = 0;
+  renderQuestion();
+  show('s-quiz');
+});
+
+/* ================= QUIZ ================= */
+function renderQuestion() {
+  const q = QUESTIONS[step];
+  $('progress').innerHTML = QUESTIONS.map((_, i) => `<span class="${i <= step ? 'on' : ''}">💗</span>`).join('');
+  $('q-emoji').textContent = q.emoji;
+  $('q-title').textContent = q.title;
+  $('q-sub').textContent = q.sub;
+  $('q-options').innerHTML = q.options.map(o => `
+    <button class="option" data-v="${o.v}">
+      <span class="e">${o.e}</span><span class="t">${o.t}</span><span class="d">${o.d}</span>
+    </button>`).join('');
+  $('q-options').querySelectorAll('.option').forEach(btn => {
+    btn.addEventListener('click', e => {
+      btn.classList.add('picked');
+      burst(e.clientX, e.clientY, 10);
+      answers[q.key] = btn.dataset.v;
+      setTimeout(() => {
+        if (step < QUESTIONS.length - 1) { step++; renderQuestion(); show('s-quiz'); }
+        else startResult();
+      }, 420);
+    });
+  });
+  $('back').style.visibility = step === 0 ? 'hidden' : 'visible';
+}
+$('back').addEventListener('click', () => { if (step > 0) { step--; renderQuestion(); } });
+
+/* ================= RISULTATO ================= */
+const HUNGER_LINES = {
+  starving: 'Hai una FAME da lupi, quindi niente perdite di tempo! 🏃‍♀️💨',
+  hungry:   'Un pancino affamato merita una cena come si deve 💕',
+  peckish:  'Solo un languorino? Prendete un paio di cose e rubagli dal piatto 😇',
+  barely:   'Quasi niente fame… allora stasera il dolce vale come cena 🍓'
+};
+
+let finalChoice = '';
+
+function startResult() {
+  res.surprised = answers.craving === 'surprise';
+  res.craving = res.surprised ? pick(CRAVINGS) : answers.craving;
+  res.mode = (answers.vibe === 'cook' || answers.vibe === 'couch') ? 'home' : 'out';
+  res.page = 0;
+  shuffleRecipes();
+  if (res.mode === 'out' && answers.hunger === 'barely') res.craving = 'sweet';
+  renderResult(true);
+  show('s-result');
+  burst(window.innerWidth / 2, window.innerHeight / 3, 26);
+}
+
+function currentList() {
+  const { hunger, vibe } = answers;
+  if (res.mode === 'home') {
+    let list = RECIPES[res.craving];
+    if (hunger === 'barely' && res.craving !== 'sweet') list = [...RECIPES.sweet, ...RECIPES.light];
+    else if (hunger === 'peckish') list = [...RECIPES.light, ...list];
+    return list;
+  }
+  let list = PLACES[res.craving].filter(p => p.tags.includes(vibe));
+  if (list.length < 2) list = PLACES[res.craving];
+  if (userPos) {
+    // i posti con coordinate vanno in ordine di distanza; le ricerche restano in fondo
+    list = [...list].sort((a, b) => {
+      if (a.search !== b.search) return a.search ? 1 : -1;
+      const da = a.ll ? haversine(userPos, a.ll) : 999, db = b.ll ? haversine(userPos, b.ll) : 999;
+      return da - db;
+    });
+  }
+  return list;
+}
+
+function placeCard(p, i, tag) {
+  const isRecipe = res.mode === 'home' && !p.delivery;
+  let links = '';
+  if (isRecipe) {
+    links = `<a href="${webSearch(p.q)}" target="_blank" rel="noopener">💗 Vedi la ricetta</a>
+             <a class="alt" href="${youtube(p.q)}" target="_blank" rel="noopener">▶️ Video tutorial</a>`;
+  } else if (p.search) {
+    const q = p.q + (userPos ? '' : ' Roma');
+    const url = userPos
+      ? `https://www.google.com/maps/search/${encodeURIComponent(p.q)}/@${userPos[0]},${userPos[1]},14z`
+      : mapsSearch(q);
+    links = `<a href="${url}" target="_blank" rel="noopener">🔎 Cerca su Maps</a>`;
+  } else {
+    links = `<a href="${mapsSearch(p.q)}" target="_blank" rel="noopener">💗 Apri su Maps</a>
+             <a class="alt" href="${mapsDir(p.q)}" target="_blank" rel="noopener">🧭 Percorso</a>`;
+  }
+  let dist = '';
+  if (!isRecipe && !p.search && !p.delivery && userPos) {
+    dist = p.ll
+      ? `<div class="dist">${distanceLabel(p)}</div>`
+      : `<div class="dist">📏 distanza esatta col tasto "Percorso" 🧭</div>`;
+  }
+  return `
+    <div class="place" style="animation-delay:${i * 0.08}s">
+      <div class="pe">${p.e}</div>
+      <div>
+        <div class="pn">${p.n}${tag ? `<span class="tag">${tag}</span>` : ''}</div>
+        ${p.a && !isRecipe ? `<div class="pa">📍 ${p.a}</div>` : ''}
+        <div class="pd">${p.d}</div>
+        ${dist}
+        <div class="links">${links}</div>
+      </div>
+    </div>`;
+}
+
+function renderResult(fresh) {
+  const { hunger, vibe } = answers;
+  const list = currentList();
+  const size = res.mode === 'home' ? 1 : PAGE_SIZE;   // a casa: una ricetta alla volta
+  const pages = Math.max(1, Math.ceil(list.length / size));
+  res.page = res.page % pages;
+  const shown = list.slice(res.page * size, res.page * size + size);
+  const cName = CRAVING_NAMES[res.craving];
+  const surpriseTxt = res.surprised && fresh !== false ? `Il quiz ha scelto <b>${cName}</b> per te! ` : '';
+
+  let title, emoji, verdict, html;
+  if (res.mode === 'home') {
+    $('locbox').style.display = 'none';
+    if (vibe === 'cook') {
+      title = 'Serata ai fornelli!'; emoji = '👩‍🍳';
+      verdict = `${HUNGER_LINES[hunger]}<br>${surpriseTxt}Stasera si sta a casa, musica accesa e si cucina insieme: <b>${cName}</b>`;
+      html = shown.map((r, i) => placeCard(r, i, i === 0 && res.page === 0 ? 'consigliata 💕' : 'ricetta')).join('');
+      finalChoice = `${shown[0].n}, cucinata insieme a casa`;
+    } else {
+      title = 'Modalità pigiama attivata!'; emoji = '🛋️';
+      verdict = `${HUNGER_LINES[hunger]}<br>${surpriseTxt}Niente pantaloni, nessun problema. Lui cucina <b>${cName}</b>, tu scegli il film 🎬`;
+      html = shown.map((r, i) => placeCard(r, i, 'cucina lui')).join('');
+      html += placeCard({ e: '🛵', n: '…oppure ordiniamo', a: 'Consegna a domicilio', delivery: true,
+        d: 'Su Deliveroo / Glovo cerca “senza glutine”, e scrivi sempre “CELIACA” nelle note dell’ordine!',
+        q: 'consegna a domicilio senza glutine Roma', search: true }, shown.length);
+      finalChoice = `divano, coccole e ${shown[0].n.toLowerCase()} (cucina lui!)`;
+    }
+  } else {
+    $('locbox').style.display = '';
+    title = vibe === 'romantic' ? 'Si esce a cena!' : 'Si esce!';
+    emoji = vibe === 'romantic' ? '🕯️' : '🛵';
+    verdict = `${HUNGER_LINES[hunger]}<br>${surpriseTxt}Il quiz dice: <b>${cName}</b>${vibe === 'romantic' ? ', con candele e outfit carini' : ', scarpe comode ai piedi'}! Scegli uno di questi posti senza glutine:`;
+    html = shown.map((p, i) => placeCard(p, i,
+      i === 0 && res.page === 0 ? (userPos ? 'il più vicino 💕' : 'consigliato 💕') : '')).join('');
+    const firstReal = shown.find(p => !p.search) || list.find(p => !p.search);
+    finalChoice = `${cName}, da ${firstReal.n}`;
+  }
+
+  $('r-title').textContent = title;
+  $('r-emoji').textContent = emoji;
+  $('r-verdict').innerHTML = verdict;
+  $('r-places').innerHTML = html;
+
+  $('refresh').style.display = pages > 1 ? '' : 'none';
+  $('refresh').textContent = res.mode === 'home' ? '🔄 Non mi convince, un\'altra ricetta!' : '🔄 Fammi vedere altre proposte';
+  $('pagecount').textContent = pages <= 1 ? '' : res.mode === 'home'
+    ? `ricetta ${res.page + 1} di ${pages} · dal nostro ricettario da ${RECIPE_COUNT} 📖💕`
+    : `pagina ${res.page + 1} di ${pages} 💕`;
+
+  $('chips').innerHTML = CRAVINGS.map(c =>
+    `<button class="chip ${c === res.craving ? 'on' : ''}" data-c="${c}">${CRAVING_NAMES[c]}</button>`).join('');
+  $('chips').querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', e => {
+    res.craving = ch.dataset.c; res.page = 0; res.surprised = false;
+    burst(e.clientX, e.clientY, 8);
+    renderResult(false);
+  }));
+
+  $('r-warning').innerHTML = res.mode === 'home'
+    ? '🌾 Promemoria: controlla che ogni etichetta dica <b>“senza glutine”</b> (dadi, salse, salumi…) e usa pentole e taglieri puliti.'
+    : `🌾 Di' sempre allo staff che sei <b>celiaca</b> e ricontrolla: menù e cucine cambiano! Le distanze sono una stima. Trovi altri locali certificati sul <a href="https://www.celiachia.it" target="_blank" rel="noopener">sito / app AIC</a>.${res.craving === 'asian' ? ' La salsa di soia normale contiene grano: chiedi il <b>tamari</b>.' : ''}`;
+}
+
+$('refresh').addEventListener('click', e => {
+  res.page++;
+  burst(e.clientX, e.clientY, 8);
+  renderResult(false);
+});
+
+/* ================= POSIZIONE ================= */
+const zoneSel = $('zone');
+Object.keys(ZONES).forEach(z => zoneSel.insertAdjacentHTML('beforeend', `<option value="${z}">${z}</option>`));
+zoneSel.addEventListener('change', () => {
+  if (!zoneSel.value) return;
+  userPos = ZONES[zoneSel.value];
+  userPosLabel = zoneSel.value;
+  $('locstatus').textContent = `Partiamo da: ${userPosLabel} 💕`;
+  res.page = 0;
+  renderResult(false);
+});
+$('geo').addEventListener('click', () => {
+  if (!navigator.geolocation) {
+    $('locstatus').textContent = 'Il telefono non me lo dice 😢 scegli la zona qui sotto';
+    return;
+  }
+  $('locstatus').textContent = 'Ti sto cercando… 🔍💗';
+  navigator.geolocation.getCurrentPosition(pos => {
+    userPos = [pos.coords.latitude, pos.coords.longitude];
+    userPosLabel = 'la tua posizione';
+    zoneSel.value = '';
+    $('locstatus').textContent = 'Trovata! Ecco quanto è lontano ogni posto 💕';
+    res.page = 0;
+    renderResult(false);
+  }, () => {
+    $('locstatus').textContent = 'Non riesco a trovarti 🥺 scegli la zona qui sotto';
+  }, { enableHighAccuracy: true, timeout: 10000 });
+});
+
+/* ================= FINALE ================= */
+$('again').addEventListener('click', () => { step = 0; renderQuestion(); show('s-quiz'); });
+
+$('lock').addEventListener('click', e => {
+  const today = new Date().toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+  $('contract').innerHTML = `In data <b>${today}</b>,<br>la fidanzata ha ufficialmente deciso:<br><br>💗 <b>${finalChoice}</b> 💗<br><br>Questa decisione è definitiva, vincolante<br>e non potrà essere rinfacciata al fidanzato. 😌`;
+  show('s-locked');
+  burst(e.clientX, e.clientY, 40);
+  setTimeout(() => burst(window.innerWidth * .25, window.innerHeight * .4, 20), 300);
+  setTimeout(() => burst(window.innerWidth * .75, window.innerHeight * .4, 20), 600);
+});
+
+$('restart').addEventListener('click', () => {
+  escapes = 0;
+  runaway.textContent = taunts[0];
+  runaway.style.left = runaway.style.top = '0px';
+  show('s-intro');
+});
+</script>
+</body>
+</html>
